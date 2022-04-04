@@ -1,4 +1,57 @@
-// Add all scripts to the JS folder
+//begin script when window loads
+window.onload = setMap();
+
+//set up choropleth map
+function setMap(){
+    //map frame dimensions
+    var width = 960,
+        height = 460;
+
+    //create new svg container for the map
+    var map = d3.select("body")
+        .append("svg")
+        .attr("class", "map")
+        .attr("width", width)
+        .attr("height", height);
+
+    //create Albers equal area conic projection centered on France
+    var projection = d3.geoCylindricalEqualArea()
+        .center([-1.82, 40.87])
+        .rotate([-12.73, 0.00, 0])
+        .parallels([43, 62])
+        .scale(200.00)
+        .translate([width/2, height/2]);
+    var path = d3.geoPath()
+        .projection(projection);
+    //use Promise.all to parallelize asynchronous data loading
+    var promises = [];    
+    promises.push(d3.csv("data/QSRanking2020.csv")); //load attributes from csv    
+    promises.push(d3.json("data/World_Countries.topojson")); //load background spatial data    
+    promises.push(d3.json("data/states.topojson")); //load choropleth spatial data 
+    Promise.all(promises).then(callback);
+    
+    function callback(data){    
+        csvData = data[0];    
+        world = data[1];
+        states = data[2];    
+        var worldcountries = topojson.feature(world, world.objects.World_Countries);
+        var allStates = topojson.feature(states, states.objects.usa);
+        //add countries to map
+        var countries = map.append("path")
+            .datum(worldcountries)
+            .attr("class", "countries")
+            .attr("d", path);
+        //add usa states to map
+        var regions = map.selectAll(".regions")
+            .data(allStates)
+            .enter()
+            .append("path")
+            .attr("class", function(d){
+                return "regions " + d.properties.adm1_code;
+            })
+            .attr("d", path);
+    };
+};
 
 
 
