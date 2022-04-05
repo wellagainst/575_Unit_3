@@ -25,7 +25,7 @@ function setMap(){
         .projection(projection);
     //use Promise.all to parallelize asynchronous data loading
     var promises = [];    
-    promises.push(d3.csv("data/QSRanking2020.csv")); //load attributes from csv  
+    //promises.push(d3.csv("data/QSRanking2020.csv")); //load attributes from csv  
     promises.push(d3.json("data/universities.topojson")); //load points data  
     promises.push(d3.json("data/World_Countries.topojson")); //load background spatial data    
     //promises.push(d3.json("data/states.topojson")); //load choropleth spatial data 
