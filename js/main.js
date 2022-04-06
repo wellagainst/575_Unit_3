@@ -37,7 +37,7 @@ function setMap(){
         world = data[1];
         states = data[2];    
         var allCountries = topojson.feature(world, world.objects.World_Countries);
-        var allStates = topojson.feature(states, states.objects.usa);
+        var allStates = topojson.feature(states, states.objects.usa).features;
         //var allUniversities = topojson.feature(universities, universities.objects.collection);
         
         //add countries to map
@@ -46,11 +46,6 @@ function setMap(){
             .attr("class", "countries")
             .attr("d", path);
         //add usa states to map
-        var usaStates = map.append("path")
-            .datum(allStates)
-            .attr("class", "regions")
-            .attr("d", path);
-        
         var usaStates = map.selectAll(".regions")
             .data(allStates)
             .enter()
