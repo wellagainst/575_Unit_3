@@ -25,35 +25,45 @@ function setMap(){
         .projection(projection);
     //use Promise.all to parallelize asynchronous data loading
     var promises = [];    
-    //promises.push(d3.csv("data/QSRanking2020.csv")); //load attributes from csv  
-    promises.push(d3.json("data/universities.topojson")); //load points data  
+    promises.push(d3.csv("data/QSRanking2020.csv")); //load attributes from csv  
+    //promises.push(d3.json("data/universities.topojson")); //load points data  
     promises.push(d3.json("data/World_Countries.topojson")); //load background spatial data    
-    //promises.push(d3.json("data/states.topojson")); //load choropleth spatial data 
+    promises.push(d3.json("data/states.topojson")); //load choropleth spatial data 
     
     Promise.all(promises).then(callback);
     
     function callback(data){    
         universities = data[0];    
         world = data[1];
-        //states = data[2];    
+        states = data[2];    
         var allCountries = topojson.feature(world, world.objects.World_Countries);
-        //var allStates = topojson.feature(states, states.objects.usa);
-        var allUniversities = topojson.feature(universities, universities.objects.collection);
+        var allStates = topojson.feature(states, states.objects.usa);
+        //var allUniversities = topojson.feature(universities, universities.objects.collection);
+        
         //add countries to map
         var countries = map.append("path")
             .datum(allCountries)
             .attr("class", "countries")
             .attr("d", path);
         //add usa states to map
-        //var usaStates = map.append("path")
-            //.datum(allStates)
-            //.attr("class", "regions")
-            //.attr("d", path);
-        //add world top 50 universities to the map
-        var worldUniversities = map.append("path")
-            .datum(allUniversities)
+        var usaStates = map.append("path")
+            .datum(allStates)
             .attr("class", "regions")
             .attr("d", path);
+        
+        var usaStates = map.selectAll(".regions")
+            .data(allStates)
+            .enter()
+            .append("path")
+            .attr("class", function(d){
+                return "regions";
+            })
+            .attr("d", path);
+        //add world top 50 universities to the map
+        //var worldUniversities = map.append("path")
+            //.datum(allUniversities)
+            //.attr("class", "regions")
+            //.attr("d", path);
     };
 };
 

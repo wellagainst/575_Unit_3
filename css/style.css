@@ -23,3 +23,9 @@
     stroke: #CCC;
     stroke-width: 2px;
 }
+
+.regions {
+    fill: black;
+    stroke: grey;
+    stroke-width: 2px;
+}
