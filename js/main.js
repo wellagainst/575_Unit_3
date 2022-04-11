@@ -1,10 +1,16 @@
+(function(){
+
+//variables for data join
+var attrArray = ["UniversityCount", "AverageAnnualCost", "AverageNetPrice", "AverageGrantAid", "AverageAlumniSalary"];
+var expressed = attrArray[0];
+
 //begin script when window loads
 window.onload = setMap();
 
 //set up choropleth map
 function setMap(){
     //map frame dimensions
-    var width = 960,
+    var width = window.innerWidth * 0.5,
         height = 460;
 
     //create new svg container for the map
@@ -14,7 +20,7 @@ function setMap(){
         .attr("width", width)
         .attr("height", height);
 
-    //create Albers equal area conic projection centered on France
+    //create Albers equal area conic projection centered on USA
     var projection = d3.geoAlbers()
         .center([0, 37.24])
         .rotate([97.36, 0, 0])
@@ -25,8 +31,7 @@ function setMap(){
         .projection(projection);
     //use Promise.all to parallelize asynchronous data loading
     var promises = [];    
-    promises.push(d3.csv("data/QSRanking2020.csv")); //load attributes from csv  
-    //promises.push(d3.json("data/universities.topojson")); //load points data  
+    promises.push(d3.csv("data/USUniversitybyState.csv")); //load attributes from csv  
     promises.push(d3.json("data/World_Countries.topojson")); //load background spatial data    
     promises.push(d3.json("data/states.topojson")); //load choropleth spatial data 
     
@@ -37,175 +42,167 @@ function setMap(){
         world = data[1];
         states = data[2];    
         var allCountries = topojson.feature(world, world.objects.World_Countries);
-        var allStates = topojson.feature(states, states.objects.usa).features;
-        //var allUniversities = topojson.feature(universities, universities.objects.collection);
+            allStates = topojson.feature(states, states.objects.usa).features;
         
         //add countries to map
         var countries = map.append("path")
             .datum(allCountries)
             .attr("class", "countries")
             .attr("d", path);
-        //add usa states to map
-        var usaStates = map.selectAll(".regions")
-            .data(allStates)
-            .enter()
-            .append("path")
-            .attr("class", function(d){
-                return "regions";
-            })
-            .attr("d", path);
-        //add world top 50 universities to the map
-        //var worldUniversities = map.append("path")
-            //.datum(allUniversities)
-            //.attr("class", "regions")
-            //.attr("d", path);
+        
+        var colorScale = makeColorScale(universities);
+
+        //join csv data to GeoJSON enumeration units
+        allStates = joinData(allStates, universities);
+        //add enumeration units to the map
+        setEnumerationUnits(allStates, map, path, colorScale);
+        
+        //add coordinated visualization to the map
+        setChart(universities, colorScale);
     };
 };
 
-
-
-//execute script when window is loaded
-window.onload = function(){
-    //SVG dimension variables
-    var w = 950, h = 500;
-    var container = d3.select("body") //get the <body> element from the DOM
-        .append("svg")
-        .attr("width", w) //assign the width
-        .attr("height", h) //assign the height
-        .attr("class", "container")
-        .style("background-color", "rgba(0,0,0,0.2)");
-    var innerRect = container.append("rect") //put a new rect in the svg
-        .datum(400)
-        .attr("width", function(d){ //rectangle width
-            return d * 2; //400 * 2 = 800
-        }) //rectangle width
-        .attr("height", function(d){ //rectangle height
-            return d; //400
-        }) //rectangle height
-        .attr("class", "innerRect") //class name
-        .attr("x", 50) //position from left on the x (horizontal) axis
-        .attr("y", 50) //position from top on the y (vertical) axis
-        .style("fill", "#FFFFFF"); //fill color
+function joinData(allStates, universities){
+    //loop through csv to assign each set of csv attribute values to geojson region
+    for (var i=0; i<universities.length; i++){
+        var csvRegion = universities[i]; //the current region
+        var csvKey = csvRegion.STATE_NAME; //the CSV primary key
         
+        //loop through geojson regions to find correct region
+        for (var j=0; j<allStates.length; j++){
+            var geojsonProps = allStates[j].properties; //the current region geojson properties
+            var geojsonKey = geojsonProps.STATE_NAME; //the geojson primary key
+            
+            //where primary keys match, transfer csv data to geojson properties object
+            if (geojsonKey == csvKey){
 
-    var cityPop = [
-        { 
-            city: 'Madison',
-            population: 233209
-        },
-        {
-            city: 'Milwaukee',
-            population: 594833
-        },
-        {
-            city: 'Green Bay',
-            population: 104057
-        },
-        {
-            city: 'Superior',
-            population: 27244
-        }
+            //assign all attributes and values
+                attrArray.forEach(function(attr){
+                    var val = parseFloat(csvRegion[attr]); //get csv attribute value
+                    geojsonProps[attr] = val; //assign attribute and value to geojson properties
+                });
+            };
+        };
+    };
+
+    return allStates;
+};
+
+function setEnumerationUnits(allStates, map, path, colorScale){
+    //add usa states to map
+    var usaStates = map.selectAll(".regions")
+        .data(allStates)
+        .enter()
+        .append("path")
+        .attr("class", function(d){
+            return "regions" + d.properties.STATE_NAME;
+        })
+        .attr("d", path)
+        .style("fill", function(d){
+            return colorScale(d.properties[expressed]);
+        });
+
+    
+};
+
+//function to create color scale generator
+function makeColorScale(data){
+    var colorClasses = [
+        "#D4B9DA",
+        "#C994C7",
+        "#DF65B0",
+        "#DD1C77",
+        "#980043"
     ];
 
-    
+    //create color scale generator
+    var colorScale = d3.scaleQuantile()
+        .range(colorClasses);
 
-    var x = d3.scaleLinear() //create the scale
-        .range([90, 810]) //output min and max
-        .domain([0, 3]); //input min and max
-        
-    var minPop = d3.min(cityPop, function(d){
-        return d.population;
-    });
+    //build array of all values of the expressed attribute
+    var domainArray = [];
+    for (var a=0; a<data.length; a++){
+        var val = parseFloat(data[a][expressed]);
+        domainArray.push(val);
+    };
 
-    var maxPop = d3.max(cityPop, function(d){
-        return d.population;
-    });
-        
-    var y = d3.scaleLinear()
-        .range([450, 50])
-        .domain([0, 700000]);
+    //assign array of expressed values as scale domain
+    colorScale.domain(domainArray);
 
-    var color = d3.scaleLinear()
-        .range([
-            "#FDBE85",
-            "#D94701"
-        ])
-        .domain([
-            minPop, 
-            maxPop
-        ]);
+    return colorScale;
+};
 
-    var circles = container.selectAll(".circles") 
-        .data(cityPop) 
+//function to create coordinated bar chart
+function setChart(universities, colorScale){
+    //chart frame dimensions
+    var chartWidth = window.innerWidth * 0.425,
+        chartHeight = 460;
+
+    //create a second svg element to hold the bar chart
+    var chart = d3.select("body")
+        .append("svg")
+        .attr("width", chartWidth)
+        .attr("height", chartHeight)
+        .attr("class", "chart");
+
+    //create a scale to size bars proportionally to frame
+    var yScale = d3.scaleLinear()
+        .range([0, chartHeight])
+        .domain([0, 105]);
+
+    //set bars for each province
+    var bars = chart.selectAll(".bars")
+        .data(universities)
         .enter()
-        .append("circle")
-        .attr("class", "circles")
-        .attr("id", function(d){ //circle radius
-             return d.city;
+        .append("rect")
+        .sort(function(a, b){
+            return b[expressed]-a[expressed]
         })
-        .attr("r", function(d){ //x coordinate
-            var area = d.population * 0.01;
-            return Math.sqrt(area/Math.PI);
+        .attr("class", function(d){
+            return "bars " + d.UniversityCount;
         })
-        .attr("cx", function(d, i){ //y coordinate
-            return x(i);
+        .attr("width", chartWidth / universities.length - 1)
+        .attr("x", function(d, i){
+            return i * (chartWidth / universities.length);
         })
-        .attr("cy", function(d){
-            return y(d.population);
+        .attr("height", function(d){
+            return yScale(parseFloat(d[expressed]));
         })
-        .style("fill", function(d, i){ //add a fill based on the color scale generator
-            return color(d.population);
+        .attr("y", function(d){
+            return chartHeight - yScale(parseFloat(d[expressed]));
         })
-        .style("stroke", "#000");
+        .style("fill", function(d){
+            return colorScale(d[expressed]);
+        });
 
-    
-    var yAxis = d3.axisLeft(y);
-    
-    //create axis g element and add axis
-    var axis = container.append("g")
-        .attr("class", "axis")
-        .attr("transform", "translate(50, 0)")
-        .call(yAxis);
-    
-    var title = container.append("text")
-        .attr("class", "title")
-        .attr("text-anchor", "middle")
-        .attr("x", 450)
-        .attr("y", 30)
-        .text("City Populations");
-
-    var labels = container.selectAll(".labels")
-        .data(cityPop)
+    //annotate bars with attribute value text
+    var numbers = chart.selectAll(".numbers")
+        .data(universities)
         .enter()
         .append("text")
-        .attr("class", "labels")
-        .attr("text-anchor", "left")
+        .sort(function(a, b){
+            return b[expressed]-a[expressed]
+        })
+        .attr("class", function(d){
+            return "numbers " + d.UniversityCount;
+        })
+        .attr("text-anchor", "middle")
+        .attr("x", function(d, i){
+            var fraction = chartWidth / universities.length;
+            return i * fraction + (fraction - 1) / 2;
+        })
         .attr("y", function(d){
-            //vertical position centered on each circle
-            return y(d.population) + 5;
-        })
-    //first line of label
-    var nameLine = labels.append("tspan")
-        .attr("class", "nameLine")
-        .attr("x", function(d,i){
-            //horizontal position to the right of each circle
-            return x(i) + Math.sqrt(d.population * 0.01 / Math.PI) + 5;
+            return chartHeight - yScale(parseFloat(d[expressed])) + 15;
         })
         .text(function(d){
-            return d.city;
+            return d[expressed];
         });
-
-
-    var format = d3.format(",");
-
-    //second line of label
-    var popLine = labels.append("tspan")
-        .attr("class", "popLine")
-        .attr("x", function(d,i){
-            return x(i) + Math.sqrt(d.population * 0.01 / Math.PI) + 5;
-        })
-        .attr("dy", "19") //vertical offset
-        .text(function(d){
-            return "Pop. " + format(d.population); //use format generator to format numbers
-        });
+    
+    var chartTitle = chart.append("text")
+        .attr("x", 20)
+        .attr("y", 40)
+        .attr("class", "chartTitle")
+        .text("Number of Universities in each state");
 };
+
+})();
