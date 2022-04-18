@@ -1,8 +1,8 @@
-(function(){
 
-    //variables for data join
+(function(){
     var attrArray = ["Number_of_Universities", "Annual_Total_Expenses", "Annual_Tuition_Fees", "Annual_Grant_Aid", "Average_Alumni_Salary"];
     var expressed = attrArray[0];
+
 
     //chart frame dimensions
     var chartWidth = window.innerWidth * 0.46,
@@ -36,9 +36,9 @@
         //create Albers equal area conic projection centered on USA
         var projection = d3.geoAlbers()
             .center([0, 37.24])
-            .rotate([97.36, -3, 0])
+            .rotate([97.36, -2.5, 0])
             .parallels([29.5, 45.5])
-            .scale(900.00)
+            .scale(920.00)
             .translate([width/2, height/2]);
         var path = d3.geoPath()
             .projection(projection);
@@ -53,9 +53,11 @@
         function callback(data){    
             var universities = data[0],    
                 world = data[1],
-                states = data[2];    
+                states = data[2];
+                  
             var allCountries = topojson.feature(world, world.objects.World_Countries__Generalized_),
                 allStates = topojson.feature(states, states.objects.USA_States_Generalized).features;
+                
             
             //add countries to map
             var countries = map.append("path")
@@ -76,8 +78,7 @@
             //add drop-down menu
             createDropdown(universities);
 
-            //add change attribute to the drop down menu
-            //changeAttribute(attribute, universities);
+            
         };
     };
 
@@ -303,7 +304,7 @@
     function highlight(props){
         
         var selected = d3.selectAll("." + props.STATE_NAME)
-            .style("stroke", "blue")
+            .style("stroke", "#ff4136")
             .style("stroke-width", "1.5");
         
         setLabel(props)
@@ -339,7 +340,7 @@
 
         var regionName = infolabel.append("div")
             .attr("class", "labelname")
-            .html(props.name);
+            .html(props.STATE_NAME);
     };
 
     //function to move info label with mouse
