@@ -1,7 +1,7 @@
 (function(){
 
     //variables for data join
-    var attrArray = ["UniversityCount", "AverageAnnualCost(k)", "AverageNetPrice(k)", "AverageGrantAid(k)", "AverageAlumniSalary(k)"];
+    var attrArray = ["Number_of_Universities", "Annual_Total_Expenses", "Annual_Tuition_Fees", "Annual_Grant_Aid", "Average_Alumni_Salary"];
     var expressed = attrArray[0];
 
     //chart frame dimensions
@@ -36,17 +36,17 @@
         //create Albers equal area conic projection centered on USA
         var projection = d3.geoAlbers()
             .center([0, 37.24])
-            .rotate([97.36, 0, 0])
+            .rotate([97.36, -3, 0])
             .parallels([29.5, 45.5])
-            .scale(500.00)
+            .scale(900.00)
             .translate([width/2, height/2]);
         var path = d3.geoPath()
             .projection(projection);
         //use Promise.all to parallelize asynchronous data loading
         var promises = [];    
         promises.push(d3.csv("data/USUniversitybyState.csv")); //load attributes from csv  
-        promises.push(d3.json("data/World_Countries.topojson")); //load background spatial data    
-        promises.push(d3.json("data/states.topojson")); //load choropleth spatial data 
+        promises.push(d3.json("data/new_worlds.topojson")); //load background spatial data    
+        promises.push(d3.json("data/new_state.topojson")); //load choropleth spatial data 
         
         Promise.all(promises).then(callback);
         
@@ -54,8 +54,8 @@
             var universities = data[0],    
                 world = data[1],
                 states = data[2];    
-            var allCountries = topojson.feature(world, world.objects.World_Countries),
-                allStates = topojson.feature(states, states.objects.usa).features;
+            var allCountries = topojson.feature(world, world.objects.World_Countries__Generalized_),
+                allStates = topojson.feature(states, states.objects.USA_States_Generalized).features;
             
             //add countries to map
             var countries = map.append("path")
@@ -134,11 +134,12 @@
     //function to create color scale generator
     function makeColorScale(data){
         var colorClasses = [
-            "#D4B9DA",
-            "#C994C7",
-            "#DF65B0",
-            "#DD1C77",
-            "#980043"
+            "#eff3ff",
+            "#bdd7e7",
+            "#6baed6",
+            "#3182bd",
+            "#08519c"
+            
         ];
 
         //create color scale generator
@@ -177,7 +178,7 @@
                 return b[expressed]-a[expressed]
             })
             .attr("class", function(d){
-                return "bar " + d.UniversityCount;
+                return "bar " + d.STATE_NAME;
             })
             .attr("width", chartInnerWidth / universities.length - 1)
             .on("mouseover", function(event, d){
@@ -189,7 +190,8 @@
             .on("mousemove", moveLabel);
         
         var chartTitle = chart.append("text")
-            .attr("x", 210)
+            .attr('x', chartWidth/2)
+            .attr('text-anchor', 'middle')
             .attr("y", 30)
             .attr("class", "chartTitle");
 
@@ -222,7 +224,7 @@
         var titleOption = dropdown.append("option")
             .attr("class", "titleOption")
             .attr("disabled", "true")
-            .text("Select Attribute");
+            .text("Select a variable");
 
         //add attribute name options
         var attrOptions = dropdown.selectAll("attrOptions")
@@ -302,7 +304,7 @@
         
         var selected = d3.selectAll("." + props.STATE_NAME)
             .style("stroke", "blue")
-            .style("stroke-width", "2");
+            .style("stroke-width", "1.5");
         
         setLabel(props)
     };
@@ -311,7 +313,7 @@
     function dehighlight(){
         
         var regions = d3.selectAll(".regions")
-            .style("stroke", "black")
+            .style("stroke", "#ffffff")
             .style("stroke-width", "0.5");
 
         var regions = d3.selectAll(".bar")

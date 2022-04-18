@@ -1,4 +1,4 @@
-STATE_NAME,UniversityCount,AverageAnnualCost(k),AverageNetPrice(k),AverageGrantAid(k),AverageAlumniSalary(k)
+STATE_NAME,Number_of_Universities,Annual_Total_Expenses,Annual_Tuition_Fees,Annual_Grant_Aid,Average_Alumni_Salary
 Alabama,8,44,21,15,94
 Arkansas,5,43,19,19,88
 Arizona,4,47,18,12,102

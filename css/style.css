@@ -2,7 +2,7 @@
 .axis path,
 .axis line {
     fill: none;
-    stroke: black;
+    stroke: #999;
     stroke-width: 1px;
     shape-rendering: crispEdges;
 }
@@ -19,18 +19,19 @@
 }
 
 .countries {
-    fill: #FFF;
-    stroke: #CCC;
+    fill: #f3f0d5;
+    stroke: #f3f0d5;
     stroke-width: 2px;
 }
 
 .regions {
-    stroke: #000;
-    stroke-width: 0.5px;
+    stroke: #f1f3f4;
+    stroke-width: 1.5px;
     stroke-linecap: round;
 }
 
 .map {
+    fill: #9cc0f9;
     border: medium solid #999;
     margin: 10px 0 0 20px;
 }
@@ -42,13 +43,6 @@
     margin: 10px 20px 0 0;
 }
 
-.axis path,
-.axis line {
-    fill: none;
-    stroke: #999;
-    stroke-width: 1px;
-    shape-rendering: crispEdges;
-}
 
 .axis text {
     font-family: sans-serif;
@@ -57,7 +51,7 @@
 }
 
 .numbers {
-    fill: white;
+    fill: #999;
     font-family: sans-serif;
     font-size: 0.4em;
 }
@@ -72,6 +66,7 @@
     padding: 2px;
     border: 1px solid #999;
     box-shadow: 2px 2px 4px #999;
+    background-color: #eff3ff;
 }
 
 option {
@@ -84,7 +79,7 @@ option {
     height: 50px;
     min-width: 100px;
     color: #fff;
-    background-color: #980043;
+    background-color: #3182bd;
     border: solid thin #fff;
     padding: 5px 10px;
     top: -75px;
