@@ -20,6 +20,42 @@
     //begin script when window loads
     window.onload = setMap();
 
+    //create the context info for the data 
+    var p1 = document.createElement('p1');
+    p1.innerHTML = "Number_of_Universities: Total number of universities in a state";
+    p1.id = "paragragh1";
+    var div = document.getElementById("context");
+    div.appendChild(p1);
+
+    var p2 = document.createElement('p2');
+    p2.innerHTML = "Annual_Total_Expenses: Average total cost of tuition, room and board, and any additional fees that the college charges per year";
+    p2.id = "paragragh2";
+    var div = document.getElementById("context");
+    div.appendChild(p2);
+
+    var p3 = document.createElement('p3');
+    p3.innerHTML = "Annual_Tuition_Fees: Average cost for one year of education subtracting any financial aid received by the students";
+    p3.id = "paragragh3";
+    var div = document.getElementById("context");
+    div.appendChild(p3);
+
+    var p4 = document.createElement('p4');
+    p4.innerHTML = "Annual_Grant_Aid: Average amount of money students receive each year to help pay for college, from sources such as the government";
+    p4.id = "paragragh4";
+    var div = document.getElementById("context");
+    div.appendChild(p4);
+
+    var p5 = document.createElement('p5');
+    p5.innerHTML = "Average_Alumni_Salary: Average salary for workers with 10 or more years of experience (payscale.com)";
+    p5.id = "paragragh5";
+    var div = document.getElementById("context");
+    div.appendChild(p5);
+
+    var p6 = document.createElement('p6');
+    p6.innerHTML = "Data Source: https://www.kaggle.com/datasets/chris95cam/forbes-americas-top-colleges-2019";
+    p6.id = "paragragh6";
+    var div = document.getElementById("context");
+    div.appendChild(p6);  
     //set up choropleth map
     function setMap(){
         //map frame dimensions
@@ -33,7 +69,8 @@
             .attr("width", width)
             .attr("height", height);
            
-          
+        
+
         //create Albers equal area conic projection centered on USA
         var projection = d3.geoAlbers()
             .center([0, 37.24])
@@ -368,40 +405,5 @@
             .style("top", y + "px");
     };
 
-    //create the context info for the data 
-    var p1 = document.createElement('p1');
-    p1.innerHTML = "Number_of_Universities: Total number of universities in a state";
-    p1.id = "paragragh1";
-    var div = document.getElementById("context");
-    div.appendChild(p1);
-
-    var p2 = document.createElement('p2');
-    p2.innerHTML = "Annual_Total_Expenses: Average total cost of tuition, room and board, and any additional fees that the college charges per year";
-    p2.id = "paragragh2";
-    var div = document.getElementById("context");
-    div.appendChild(p2);
-
-    var p3 = document.createElement('p3');
-    p3.innerHTML = "Annual_Tuition_Fees: Average cost for one year of education subtracting any financial aid received by the students";
-    p3.id = "paragragh3";
-    var div = document.getElementById("context");
-    div.appendChild(p3);
-
-    var p4 = document.createElement('p4');
-    p4.innerHTML = "Annual_Grant_Aid: Average amount of money students receive each year to help pay for college, from sources such as the government";
-    p4.id = "paragragh4";
-    var div = document.getElementById("context");
-    div.appendChild(p4);
-
-    var p5 = document.createElement('p5');
-    p5.innerHTML = "Average_Alumni_Salary: Average salary for workers with 10 or more years of experience (payscale.com)";
-    p5.id = "paragragh5";
-    var div = document.getElementById("context");
-    div.appendChild(p5);
-
-    var p6 = document.createElement('p6');
-    p6.innerHTML = "Data Source: https://www.kaggle.com/datasets/chris95cam/forbes-americas-top-colleges-2019";
-    p6.id = "paragragh6";
-    var div = document.getElementById("context");
-    div.appendChild(p6);
+    
 })();
