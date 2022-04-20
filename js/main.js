@@ -20,42 +20,6 @@
     //begin script when window loads
     window.onload = setMap();
 
-    //create the context info for the data 
-    var p1 = document.createElement('p1');
-    p1.innerHTML = "Number_of_Universities: Total number of universities in a state";
-    p1.id = "paragragh1";
-    var div = document.getElementById("context");
-    div.appendChild(p1);
-
-    var p2 = document.createElement('p2');
-    p2.innerHTML = "Annual_Total_Expenses: Average total cost of tuition, room and board, and any additional fees that the college charges per year";
-    p2.id = "paragragh2";
-    var div = document.getElementById("context");
-    div.appendChild(p2);
-
-    var p3 = document.createElement('p3');
-    p3.innerHTML = "Annual_Tuition_Fees: Average cost for one year of education subtracting any financial aid received by the students";
-    p3.id = "paragragh3";
-    var div = document.getElementById("context");
-    div.appendChild(p3);
-
-    var p4 = document.createElement('p4');
-    p4.innerHTML = "Annual_Grant_Aid: Average amount of money students receive each year to help pay for college, from sources such as the government";
-    p4.id = "paragragh4";
-    var div = document.getElementById("context");
-    div.appendChild(p4);
-
-    var p5 = document.createElement('p5');
-    p5.innerHTML = "Average_Alumni_Salary: Average salary for workers with 10 or more years of experience (payscale.com)";
-    p5.id = "paragragh5";
-    var div = document.getElementById("context");
-    div.appendChild(p5);
-
-    var p6 = document.createElement('p6');
-    p6.innerHTML = "Data Source: https://www.kaggle.com/datasets/chris95cam/forbes-americas-top-colleges-2019";
-    p6.id = "paragragh6";
-    var div = document.getElementById("context");
-    div.appendChild(p6);  
     //set up choropleth map
     function setMap(){
         //map frame dimensions
@@ -116,7 +80,7 @@
             //add drop-down menu
             createDropdown(universities);
 
-            
+            setMetadata();
         };
     };
 
@@ -335,7 +299,7 @@
             });
         
         var chartTitle = d3.select(".chartTitle")
-            .text(expressed + " in each State");
+            .text(expressed + " in each state");
     };
 
     //function to highlight enumeration units and bars
@@ -405,5 +369,14 @@
             .style("top", y + "px");
     };
 
-    
+    function setMetadata(){
+        var metaData = d3.select("body")
+            .append("svg")
+            .attr("width", 1815)
+            .attr("height", 460)
+            .attr("class", "chart")
+            .append("text")
+            .text("Number_of_Universities: Total number of universities in a state."+"\r\n"+"Annual_Total_Expenses (in 1000 dollars): Average total cost of tuition, room and board, and any additional fees that the college charges per year"+"\r\n"+"Annual_Tuition_Fees (in 1000 dollars): Average cost for one year of education subtracting any financial aid received by the students"+"\r\n"+"Annual_Grant_Aid (in 1000 dollars): Average amount of money students receive each year to help pay for college, from sources such as the government"+"\r\n"+"Average_Alumni_Salary (in 1000 dollars): Average salary for workers with 10 or more years of experience (payscale.com)"+"\r\n"+"Data Source: https://www.kaggle.com/datasets/chris95cam/forbes-americas-top-colleges-2019")
+            .attr("y", 30);
+    }
 })();
