@@ -379,4 +379,5 @@
             .text("Number_of_Universities: Total number of universities in a state."+"\r\n"+"Annual_Total_Expenses (in 1000 dollars): Average total cost of tuition, room and board, and any additional fees that the college charges per year"+"\r\n"+"Annual_Tuition_Fees (in 1000 dollars): Average cost for one year of education subtracting any financial aid received by the students"+"\r\n"+"Annual_Grant_Aid (in 1000 dollars): Average amount of money students receive each year to help pay for college, from sources such as the government"+"\r\n"+"Average_Alumni_Salary (in 1000 dollars): Average salary for workers with 10 or more years of experience (payscale.com)"+"\r\n"+"Data Source: https://www.kaggle.com/datasets/chris95cam/forbes-americas-top-colleges-2019")
             .attr("y", 30);
     }
+
 })();
